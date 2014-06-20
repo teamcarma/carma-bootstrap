@@ -1,25 +1,18 @@
-# Carma Bootstrap #
-A simple HTML5 and JavaScript application that illustrates how to use the Carma APIs within a web application. 
+var accessToken = null;
+var user = {};
 
-This is intended to be used as a reference application for developers who wish to use the Carma API, particularly those who are interested in entering the [Carma Prize](http://carmacarpool.com/prize)
+/** 
+ * LOGIN RELATED FUNCTIONS
+ **/
+//endpoint for authentication 
+var AUTH_URL = "https://api-dev.car.ma/security/oauth/token";
+//login
+function login() {
+	var username = $("#email").val();
+	var password = $("#password").val();
 
-This reference app will continue to be extended to illustrate more of the APIs. 
-
-At present the application covers the login and signup flows. 
-
-### Client Keys ###
-Note that the [fast access](https://api.car.ma/apidoc/authentication.action#authdev) authentication to the Carma development server. If you are using the Carma API it is recommended to request [access to the API](https://api.car.ma/apidoc/signup.action). 
-
-### Running this example application ###
-To run this application, simply host the folder on any web server, and open index.html from your web browser.
-
-## Login ##
-
-Login to the Carma app is achieved through a two steps. First the token is retrieved by calling https://api-dev.car.ma/security/oauth/token 
-
-```javascript
-
-$.ajax({
+	//get the oauth token for this user. 
+	$.ajax({
 		url: AUTH_URL,
 		type: "POST",
 		data: {
@@ -32,19 +25,21 @@ $.ajax({
 		}
 	})
 		.done(function(data) {
-			//get the token
+			if (console && console.log) {
+				console.log("Sample of data:" + JSON.stringify(data));
+			}
 			token = data.access_token;
+			//now get the user details
+			getAccountDetails();
 		})
 		.error(function(error){
 			alert("There was an error logging in " + JSON.stringify(error));
 		});
+}
 
-	```
-
-Following this step, the full account details can be retrieved by making a call to the [user endpoint] (https://api-dev.car.ma/apidoc/endpoints/rest.v2.object.users.id.action) https://api-dev.car.ma/api/rtr/v2.0/object/users/self
-
-
-```javascript
+/** 
+ * This function retrieves the user details after a token has been obtained 
+ **/
 var ACCOUNT_DETAILS = "https://api-dev.car.ma/api/rtr/v2.0/object/users/self";
 function getAccountDetails() {
 	
@@ -59,25 +54,40 @@ function getAccountDetails() {
 			user.id = data.userId; 
 			user.firstName = data.firstName; 
 			user.alias = data.alias;	
+			updateUserInterface();
 		}
 		)
 		.error(function(error){
 			alert("There was an error retrieving the user details");
 		});
 }	
-```
-
-## Signup ##
-
-Sign up is achieved by making a call to the [user creation endpoint](https://api-dev.car.ma/apidoc/endpoints/rest.v1.object.users.create.action). 
 
 
-```javascript
+/** 
+ * This function updates the user interface so that the user appears as logged in 
+ **/
+function updateUserInterface(){
+
+	$("#loginForm").hide();
+	$("#username").text(user.alias);
+	$("#userDetails").show();
+}
+
+
+/** 
+ * FUNCTIONS TO CREATE ACCOUNTS 
+ **/
+
 var CREATE_ACCOUNT_URL = "https://api-dev.car.ma/v1/object/users/create?client_id=example-client&client_secret=example";
 
 function createAccount(){
 	var firstName, lastName, email, password, gender; 
-	//get details from HTML page
+	
+	firstName = $("#firstName").val();
+	lastName = $("#lastName").val();
+	email = $("#signup_email").val();
+	password = $("#signup_password").val();
+	gender = $("#gender").val();
 
 	var userObject = {"firstName": firstName, "lastName" : lastName, "email": email, "password": password, "gender": gender};
 
@@ -107,8 +117,9 @@ $.ajax({
 		     var errorDesc = $.parseJSON(error.responseText).description;
 		     alert(errorDesc);
 		});
+
+
+
+
 }
-```
 
-
-For further questions about use of the API, send an email to carma-apis@car.ma 

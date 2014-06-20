@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Carma Bootstrap</title>
+
+    <!-- Bootstrap -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <!-- Local style sheet --> 
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Carma Bootstrap</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <!-- Hidden div, until logged in -->
+          <div class="navbar-right" style="display:none" id="userDetails">
+              <p id="username"/>
+          </div>
+
+          <form class="navbar-form navbar-right" role="form" id="loginForm">
+            <div class="form-group">
+              <input type="text" id="email" placeholder="Email" value="james.sugrue@avego.com" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" id="password" placeholder="Password" value="avegoavego" class="form-control">
+            </div>
+            <button class="btn btn-success" type="button" onClick="login()">Login</button>
+             <a  href="#" data-toggle="modal" data-target="#signupForm" >Create Account</a>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Carma Bootstrap</h1>
+        <p>This is a simple HTML5 web application that showcases different parts of the Carma API to illustrate how an application can be built.</p>
+
+        <p>Everything here is fully functional, so that you can see the code involved for login and user signup. Discovery and other functionality will be added in the coming days</p>
+
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-4">
+          <h2>How to use this demo</h2>
+          <p>If you have already got a developer account with Carma, you can use it to log in using the controls on the top right corner.</p>
+          <p>If you don't have an account yet, then you can create an account using the <a href="#" data-toggle="modal" data-target="#signupForm">sign up page</a></p>
+          
+          <p><a class="btn btn-default" href="#" data-toggle="modal" data-target="#signupForm" role="button">Sign Up</a></p>
+        </div>
+        <div class="col-md-4">
+          <h2>Change Client Secret</h2>
+          <p>This application uses the sample application keys that point to the Carma developer server.</p>
+          <p>Please <a href="https://api.car.ma/apidoc/signup.action" target="_blank">apply</a> for a development key for your own applications</p>
+        </div>
+        <div class="col-md-4">
+  
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>&copy; Carma 2014</p>
+      </footer>
+    </div> <!-- /container -->
+  
+
+    <!-- Modal Dialog --> 
+
+<!-- Modal -->
+<div class="modal fade" id="signupForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Carma Signup Example</h4>
+      </div>
+      <div class="modal-body">
+          <form role="form">
+            <div class="form-group">
+              <label for="firstName">First name</label>
+              <input type="text" class="form-control" id="firstName" placeholder="First name">
+            </div>
+          
+             <div class="form-group">
+              <label for="lastName">Last name</label>
+              <input type="text" class="form-control" id="lastName" placeholder="Last name">
+            </div>
+
+            <div class="form-group">
+              <label for="signup_email">Email address</label>
+              <input type="email" class="form-control" id="signup_email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+              <label for="signup_password">Password</label>
+              <input type="password" class="form-control" id="signup_password" placeholder="Password">
+            </div>
+        
+           <div class="form-group">
+              <label for="gender">Gender</label>
+            
+              <div class="radio">
+                <label>
+                  <input type="radio" name="gender" id="gender" value="m" checked>
+                  Male
+                </label>
+              </div>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="gender" id="gender" value="f">
+                    Female
+                </label>
+              </div>
+
+            </div>
+          </form>  
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onClick="createAccount()">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <script src="js/app.js"></script>
+  </body>
+</html>
