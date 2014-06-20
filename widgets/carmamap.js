@@ -105,7 +105,6 @@ function MapAppGenerator(location) {
 			return;
 		}
 
-		$.getScript("//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js");
 		_jqUpdateSize();
 		_initializeMap();
 		_initEventListeners();
