@@ -38,8 +38,7 @@ $.ajax({
 		.error(function(error){
 			alert("There was an error logging in " + JSON.stringify(error));
 		});
-
-	```
+```
 
 Following this step, the full account details can be retrieved by making a call to the [user endpoint] (https://api-dev.car.ma/apidoc/endpoints/rest.v2.object.users.id.action) https://api-dev.car.ma/api/rtr/v2.0/object/users/self
 
