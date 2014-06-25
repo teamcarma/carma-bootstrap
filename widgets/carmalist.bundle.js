@@ -1,7 +1,18 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/**
+ *	Widget to generate a list of trips, departing from a given location, within 
+ *	a radius and at a certain time. For the developing of the widget we used 
+ * 	browserify to avoid conflicts with user's plugins. http://browserify.org/
+ *
+ * 	@author antoniocarrasco
+ */
 var $ = require("./jquery-1.10.2.min");
 var _ = require("./underscore-min");
 
+/**
+ *	Class that generates "unique" ids for the widget. In order to insert multiple 
+ * 	widgets per page, we need to uniquely identify them.
+ */
 var guid = (function() {
 	var _guids = [];
 
@@ -31,6 +42,11 @@ var guid = (function() {
 	};
 })();
 
+/**
+ *	Main class of the widget. It prepares the UI and inits the widget.
+ *
+ * 	@param {object} params - Contains latitude, longitude, radius and departure time.
+ */
 var ListAppGenerator = function(params) {
 
 	var self = this;
@@ -47,16 +63,28 @@ var ListAppGenerator = function(params) {
 };
 
 $.extend(ListAppGenerator.prototype, {
-
+	// API url
 	_tripSearchUrl: "https://api-dev.car.ma/v1/object/trip/searchTrips?originLat=<%= lat %>&originLon=<%= lon %>&originRadius=<%= radius %>&departureTimeStart=<%= departureTime %>",
+	// template to generate the user's trip
 	_userRow: "<li style=\"min-height: 60px; border: 1px solid #ddd; border-top: 0 none; padding: 5px;\"><img style=\"height: 50px; float: left; margin-top: 5px;\" src=\"<%= photoUrl %>\" alt=\"<%= alias %>\"/><p style=\"margin-left: 65px; margin-bottom: 0;\"><%= alias %><br />Going to: <%= destination %><br /><%= time %></p></li>",
 
+	/**
+	 *	Performs the request to the carma API to fetch trips departing from a 
+	 *	given location (or within a radius distance) and at a certain time.
+	 *
+	 * 	@param {object} params - Contains latitude, longitude, radius and departure time.
+	 */
 	_carmaApiRequest: function(params) {
 		var url = _.template(this._tripSearchUrl, {lat: params.latitude, lon: params.longitude, radius: params.radius, departureTime: params.departureTime});
 		
 		$.get(url, this._processCarmaResponse, "JSON");
 	},
 
+	/**
+	 *	Processes the response from the API request.
+	 *
+	 * 	@param {object} data - Contains all the trips fetched from the server.
+	 */
 	_processCarmaResponse: function(data) {
 		if (!data.paginator.totalResults) {
 			// TODO there are not results so do something
@@ -82,6 +110,11 @@ $.extend(ListAppGenerator.prototype, {
 		$("#" + this.id).find("li").first().css("border-top", "1px solid #ddd");
 	},
 
+	/**
+	 *	Helper method to format departure time. 
+	 *
+	 * 	@param {object} date - Date object with the departure time.
+	 */
 	_formatTime: function(date) {
 		var hour = ("0" + date.getHours()).slice(-2);
 		var minutes = ("0" + date.getMinutes()).slice(-2);
@@ -91,6 +124,12 @@ $.extend(ListAppGenerator.prototype, {
 		return dateString;
 	},
 
+	/**
+	 *	Helper method to get user's photo given a url at a certain size.
+	 *
+	 * 	@param {string} url - Url of the user's picture
+	 *	@param {object} size - Contains width and height desired for the picture.
+	 */
 	_resizeCloudinaryPhoto: function(url, size) {
 		var splitIdx = url.indexOf("upload/");
 		if (splitIdx > 0) {
@@ -100,6 +139,12 @@ $.extend(ListAppGenerator.prototype, {
 		return url;
 	},
 
+	/**
+	 *	Helper method to get user's photo given a url at a certain size.
+	 *
+	 * 	@param {string} url - Url of the user's picture
+	 *	@param {object} size - Contains width and height desired for the picture.
+	 */
 	_resizeAPIPhoto: function(url, size) {
 		if (url.indexOf("?") > 0) {
 			return url += "&width=" + size.width + "&height=" + size.height;
@@ -107,6 +152,11 @@ $.extend(ListAppGenerator.prototype, {
 		return url += "?width=" + size.width + "&height=" + size.height;
 	},
 
+	/**
+	 *	Helper method to get user's photo given a url at a certain size.
+	 *
+	 * 	@param {string} url - Url of the user's picture
+	 */
 	_getResizedPhotoUrl: function(url) {
 		if (!url) {
 			return null;
@@ -119,13 +169,22 @@ $.extend(ListAppGenerator.prototype, {
 		return this._resizeAPIPhoto(url, size);
 	},
 
-	init: function(location) {
+	/**
+	 *	Inits the widget.
+	 *
+	 * 	@param {object} params - Contains latitude, longitude, radius and departure time.
+	 */
+	init: function(params) {
 		_.bindAll(this, "_processCarmaResponse");
 
-		this._carmaApiRequest(location);
+		this._carmaApiRequest(params);
 	}
 });
 
+/**
+ *	Browserify encapsulates the widget, so we have to export the class to make 
+ *	it visible from outside.
+ */
 window.ListAppGenerator = ListAppGenerator;
 },{"./jquery-1.10.2.min":2,"./underscore-min":3}],2:[function(require,module,exports){
 /*! jQuery v1.10.2 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license
