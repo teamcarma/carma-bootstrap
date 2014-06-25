@@ -1,7 +1,18 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/**
+ *	Widget to generate a google map with people nearby to a given location. For 
+ * 	the developing of the widget we used browserify to avoid conflicts with user's 
+ * 	plugins. http://browserify.org/
+ *
+ * 	@author antoniocarrasco
+ */
 var $ = require("./jquery-1.10.2.min");
 var _ = require("./underscore-min");
 
+/**
+ * 	Class that handles all the callbacks to be executed once google map api has 
+ * 	been loaded.
+ */
 var callbackHandler = (function() {
 	var _mapLoaderCallbacks = [];
 
@@ -18,6 +29,10 @@ var callbackHandler = (function() {
 	};
 })();
 
+/**
+ *	Class that generates "unique" ids for the widget. In order to insert multiple 
+ * 	widgets per page, we need to uniquely identify them.
+ */
 var guid = (function() {
 	var _guids = [];
 
@@ -47,17 +62,30 @@ var guid = (function() {
 	};
 })();
 
+/**
+ *	Main class of the widget. It prepares the UI and downloads google map library.
+ *
+ * 	@param {object} location - Contains latitude and longitude.
+ */
 var MapAppGenerator = function(location) {
 
 	var self = this;
 	this.id = "carma-widget-" + guid.generate();
 
+	/**
+	 *	Renders UI div that will contain the map.
+	 */
 	var _configure = function() {
 		document.write("<div id='" + self.id + "'></div>");
 
 		_loadGoogleApi();
 	};
 
+	/**
+	 *	Downloads and reads google map library. In case of multiple widgets, it 
+	 * 	will be loaded only once. Once library is ready, mapReady method of the 
+	 *	window object will be executed.
+	 */
 	var _loadGoogleApi = function() {
 		callbackHandler.push(_mapLoadedCallback);
 
@@ -66,7 +94,7 @@ var MapAppGenerator = function(location) {
 		}
 
 		window.loadingMap = true;
-		// Make sure that all the maps are read before importin the library
+		// Make sure that all the maps are read before importing the library
 		$(document).ready(function() {
 			var script = document.createElement("script");
 			script.type = "text/javascript";
@@ -75,6 +103,9 @@ var MapAppGenerator = function(location) {
 		});
 	};
 
+	/**
+	 *	Callback to be executed once DOM and google map are ready.
+	 */
 	var _mapLoadedCallback = function() {
 		$(document).ready(function() {
 			self.init && self.init(location);
@@ -85,12 +116,18 @@ var MapAppGenerator = function(location) {
 };
 
 $.extend(MapAppGenerator.prototype, {
-
+	// API url
 	_tripSearchUrl: "https://api-dev.car.ma/v1/object/trip/searchTrips?originLat=<%= lat %>&originLon=<%= lon %>",
+	// map holder
 	_map: null,
-	_mapLoaded: false,
+	// template to generate the popup with info from the user
 	_infoWindowTemplate: "<div style=\"min-width: 125px;\"><img style=\"width:50px; height:50px; float:left;\" src=\"<%= photoUrl %>\" alt=\"<%= alias %>\"/><p style=\"margin-left: 55px;\"><%= alias %><br/>Going to: <%= destination %></p></div>",
 
+	/**
+	 *	Inits the map.
+	 *
+	 * 	@param {object} location - Contains latitude and longitude.
+	 */
 	_initializeMap: function(location) {
 		var myOptions = {
 			mapTypeId: google.maps.MapTypeId.ROADMAP,
@@ -102,19 +139,22 @@ $.extend(MapAppGenerator.prototype, {
 		this._map = new google.maps.Map(document.getElementById(this.id), myOptions);
 	},
 
-	_initEventListeners: function() {
-		var self = this;
-		google.maps.event.addListener(this._map, "tilesloaded", function() {
-			self._mapLoaded = true;
-		});
-	},
-
+	/**
+	 *	Performs the request to the carma API to fetch nearby users to the given location.
+	 *
+	 * 	@param {object} location - Contains latitude and longitude.
+	 */
 	_carmaApiRequest: function(location) {
 		var url = _.template(this._tripSearchUrl, {lat: location.latitude, lon: location.longitude});
 		
 		$.get(url, this._processCarmaResponse, "JSON");
 	},
 
+	/**
+	 *	Processes the response from the API request.
+	 *
+	 * 	@param {object} data - Contains all the trips fetched from the server.
+	 */
 	_processCarmaResponse: function(data) {
 		if (!data.paginator.totalResults) {
 			// TODO there are not results so do something
@@ -150,6 +190,12 @@ $.extend(MapAppGenerator.prototype, {
 		this._map.fitBounds(bounds);
 	},
 
+	/**
+	 *	Helper method to get user's photo given a url at a certain size.
+	 *
+	 * 	@param {string} url - Url of the user's picture
+	 *	@param {object} size - Contains width and height desired for the picture.
+	 */
 	_resizeCloudinaryPhoto: function(url, size) {
 		var splitIdx = url.indexOf("upload/");
 		if (splitIdx > 0) {
@@ -159,6 +205,12 @@ $.extend(MapAppGenerator.prototype, {
 		return url;
 	},
 
+	/**
+	 *	Helper method to get user's photo given a url at a certain size.
+	 *
+	 * 	@param {string} url - Url of the user's picture
+	 *	@param {object} size - Contains width and height desired for the picture.
+	 */
 	_resizeAPIPhoto: function(url, size) {
 		if (url.indexOf("?") > 0) {
 			return url += "&width=" + size.width + "&height=" + size.height;
@@ -166,6 +218,11 @@ $.extend(MapAppGenerator.prototype, {
 		return url += "?width=" + size.width + "&height=" + size.height;
 	},
 
+	/**
+	 *	Helper method to get user's photo given a url at a certain size.
+	 *
+	 * 	@param {string} url - Url of the user's picture
+	 */
 	_getResizedPhotoUrl: function(url) {
 		if (!url) {
 			return null;
@@ -178,6 +235,9 @@ $.extend(MapAppGenerator.prototype, {
 		return this._resizeAPIPhoto(url, size);
 	},
 
+	/**
+	 *	Helper method set height of the map div. Called on every window resize event.
+	 */
 	_jqUpdateSize: function() {
 		// Get the dimensions of the viewport
 		var height = $("#" + this.id).height();
@@ -186,18 +246,26 @@ $.extend(MapAppGenerator.prototype, {
 		$("#" + this.id).height(width / 2);
 	},
 
+	/**
+	 *	Inits the widget.
+	 *
+	 * 	@param {object} location - Contains latitude and longitude.
+	 */
 	init: function(location) {
 		_.bindAll(this, "_processCarmaResponse", "_jqUpdateSize", "init");
 
 		this._jqUpdateSize();
 		this._initializeMap(location);
-		this._initEventListeners();
 		this._carmaApiRequest(location);
 
 		$(window).resize(this._jqUpdateSize);
 	}
 });
 
+/**
+ *	Browserify encapsulates the widget, so we have to export the class to make 
+ *	it visible from outside.
+ */
 window.MapAppGenerator = MapAppGenerator;
 },{"./jquery-1.10.2.min":2,"./underscore-min":3}],2:[function(require,module,exports){
 /*! jQuery v1.10.2 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license
