@@ -109,12 +109,12 @@ $.ajax({
 }
 ```
 
+For further questions about use of the API, send an email to carma-apis@car.ma
+
 
 ## Carma Widgets ##
 
-Widgets are using jQuery and underscore. In order to avoid conflicts with user's own plugin we have used browserify to encapuslate these js libraries.
+Widgets are using jQuery and underscore. In order to avoid conflicts with user's own plugins we have used browserify to encapuslate these js libraries.
 
 You can find information about this package here: http://browserify.org
 
-
-For further questions about use of the API, send an email to carma-apis@car.ma 
